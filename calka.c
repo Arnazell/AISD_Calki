@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "calki.c"
+#include <time.h>
 
 double f1(double x)
 {
@@ -16,10 +17,17 @@ return y;
 
 int main(int argc, char *argv[])
 {  
+     clock_t start, end;
+    double cpu_time_used;
+
+    start = clock();
+
+    // Tutaj umieść kod, którego czas wykonania chcesz zmierzyć
+   
     printf("od=");
-    scanf("%lf",&c_od);
+    //scanf("%lf",&c_od);
     printf("do=");
-    scanf("%lf",&c_do); 
+    //scanf("%lf",&c_do); 
     printf ("\n\nFunkcja 1 \n");
     printf( "wynik prostokaty - %lf\n" ,prostokaty(f1));
     printf( "wynik trapezy    - %lf\n" ,trapezy(f1));
@@ -36,6 +44,12 @@ int main(int argc, char *argv[])
 	printf( "wynik prostokaty - %lf\n" ,prostokaty(f4));
     printf( "wynik trapezy    - %lf\n" ,trapezy(f4));
     printf( "wynik MC   - %lf\n", mc(f4));
+
+      end = clock();
+
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+
+    printf("Czas wykonania: %f sekund\n", cpu_time_used);
     
     return 0;
 }
