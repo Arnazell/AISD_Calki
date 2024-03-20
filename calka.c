@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
     // Tutaj umieść kod, którego czas wykonania chcesz zmierzyć
    
     printf("od=");
-    //scanf("%lf",&c_od);
+    scanf("%lf",&c_od);
     printf("do=");
-    //scanf("%lf",&c_do); 
+    scanf("%lf",&c_do); 
     printf ("\n\nFunkcja 1 \n");
     printf( "wynik prostokaty - %lf\n" ,prostokaty(f1));
     printf( "wynik trapezy    - %lf\n" ,trapezy(f1));

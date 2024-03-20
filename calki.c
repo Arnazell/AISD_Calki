@@ -2,91 +2,90 @@
 #include <stdio.h>
 #include <math.h>
 #include<time.h>
-#define lp 10000
+#define lp 1000
 // liczba losowan w metodzie Monte Carlo
-#define N 10000
+#define N 70000
 // dokladnosc szacowania min i max w metodzie Monte Carlo
-#define n 1000
-double c_od=1,c_do=6;
+#define n 40000
+double c_od,c_do;
 
 double f3(double x)
 {
- return 1/(sqrt(pow(x,5)+8));      
+
+ return pow(sin(x), 5)*cos(x);   
 }      
 double f4(double x) {
 
- return 1;
+ return x*sin(2*x*x+1);
 }
-
 
 double prostokaty(double( *f)(double))
 {
        double krok, p, suma=0;
+
        krok=(c_do-c_od)/lp;
-       for(p=c_od; p<c_do; p+=krok)
-               suma+=abs((*f)(p));
+// upewnij sie co z ta wartoscia bezwzgledna
+       for(p=c_od; p<=c_do; p+=krok)
+               suma+=(*f)(p);
        return suma*krok;      
 }
 
 double trapezy(double (*f)(double))
 {
         double krok=(c_do-c_od)/lp; //wysokosć trapezów
-	double suma = 0.0; // suma pol
-	double podstawa_a = abs((*f)(c_od)), podstawa_b;
-		
-	for(int i=1;i<=lp;i++)
+	double suma = 0.5 * ((*f)(c_od) + (*f)(c_do)); // suma pol
+
+	for(double i=c_od+krok; i < c_do ; i+=krok)
 	{
-		podstawa_b = abs((*f)(c_od+krok*i));
-		suma += (podstawa_a+podstawa_b);
-		podstawa_a = podstawa_b;
+		suma += (*f)(i);
 	}
-	return suma*0.5*krok;
-return 1;
+	return krok * suma ;
+
 }
        
 double mc(double(*f)(double))
 {
-        // inicjailzacja generatora liczb pseudolosowych
-         srand(time(0));
-
         // inicjalizacja zmiennych
-         double MAX = 0;
-         double MIN = 0;
+         double MAX = (*f)(c_od);
+         double MIN = (*f)(c_od);
          double krok=(c_do-c_od)/n;
+         double x, y;
          // wylosowane punkty ktore naleza do obszaru, ktorego pole liczymy
-         int trafienia = 0;
+        int trafienia = 0;
+        double wartosc; 
 
-         
          // szukanie MAX i MIN w podanym przedziale
-         for(double i=c_od; i<c_do; i= i+krok)
+         for(double i=c_od; i<=c_do; i= i+krok)
          {
-                double wartosc = (*f)(i);
-                if(MAX <= wartosc)
+                wartosc = (*f)(i);
+                if(MAX < wartosc)
                 {
                         MAX = wartosc;
                 }
-                else
+                else if (wartosc < MIN)
                 {
                         MIN = wartosc;
                 }
          }
-
-        // Jesli funkcja przyjmuje wartosci ujemne, to poprzez przesuniecie jej wraz szukanyym polem o MIN wzdloz osi OY nie zmienia wyniku, a upraszcza obliczenia - cala funkcja znajduje sie nad osia OY
-        MAX += abs(MIN);
-        // losowanie punktow z prostokata ograniczonego przez proste y=max, y=min, x=od, x=do
-        for(int i=0; i<N; i++)
+        // losujemy punkty
+        for(int i=0; i< N; i++)
         {
-                // wylosuj punkt
-                int x = c_od + rand() % 1;
-                // DO UFNKCJI TERAZ TRZABA DODAC MIN
-                int y = 0 + rand() % 6;
+                // losowanie wspolzednych punktu
+                x = c_od + (c_do -c_od) * rand() / (float)RAND_MAX;
+                y = MIN + (MAX - MIN) * rand() / (float)RAND_MAX;
+                //printf("MIN: %lf\n", x );
+                wartosc = (*f)(x);
 
-                if((*f)(x)+MIN >= y)
+                //sprawdzenie czy punkt nalezy do szukanego obszatu
+                if (y <= wartosc)
                 {
-                        trafienia++;
+                        if (y >=0) trafienia++;
+                }
+                else
+                {
+                        if (y <= 0) trafienia--;
                 }
         }
-        printf("oo: %lf\n", MAX);
-        printf("od: %lf\n", c_od);
-        return MAX*(c_do-c_od)*trafienia/N;
+     
+       return (MAX-MIN)*(c_do-c_od)*trafienia/N;
 }
